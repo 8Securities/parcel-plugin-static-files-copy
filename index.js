@@ -112,9 +112,16 @@ module.exports = bundler => {
 
         const bundleDir = path.dirname(bundle.name || bundler.mainBundle.childBundles.values().next().value.name);
         for (let dir of config.staticPath) {
-            const copyTo = dir.staticOutDir
-                ? path.join(bundleDir, dir.staticOutDir)
-                : bundleDir;
+            let copyTo;
+            if (dir.staticOutDir) {
+                if (dir.staticOutDir.startsWith('~')) {
+                    copyTo = dir.staticOutDir.substring(1);
+                } else {
+                    copyTo = path.join(bundleDir, dir.staticOutDir);
+                }
+            } else {
+                copyTo = bundleDir;
+            }
 
             copyDir(path.join(pkg.pkgdir, dir.staticPath), copyTo);
         }
